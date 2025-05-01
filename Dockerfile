@@ -1,22 +1,15 @@
-FROM node:22
+FROM node:20
 
-# Set the working directory
 WORKDIR /usr/src/app
 
-# Copy the package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install
+RUN npm cache clean --force && npm install --legacy-peer-deps
 
-# Copy the entire application code
 COPY . .
 
-# Build the NestJS application
 RUN npm run build
 
-# Expose the application port
 EXPOSE 3000
 
-# Command to run the application
 CMD ["npm", "run", "start:prod"]
