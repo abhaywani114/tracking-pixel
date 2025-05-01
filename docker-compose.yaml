@@ -1,0 +1,42 @@
+version: '3'
+services:
+
+  postgres:
+    image: postgres
+    hostname: postgres
+    ports:
+      - '5432:5432'
+    env_file:
+      - .env
+    volumes:
+      - ./database/data:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4
+    depends_on:
+      - postgres
+    ports:
+      - '15432:80'
+    env_file:
+      - .env
+    logging:
+      driver: "local"
+      options:
+        max-size: "10m" # Limit the log file size
+        max-file: "3"   # Keep up to 3 rotated log files
+
+  tracking-pixel-backend:
+    build:
+      context: './'
+      dockerfile: './Dockerfile'
+    container_name: 'tracking-pixel-backend'
+    env_file:
+      - .env
+    ports:
+      - '3001:3000'
+    depends_on:
+      - postgres
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_module
+    command: npm run start:dev
